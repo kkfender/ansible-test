@@ -1,0 +1,22 @@
+---
+- name: Allow HTTP traffic using firewalld
+  hosts: targets
+  become: yes
+
+  tasks:
+    - name: Ensure firewalld is installed
+      ansible.builtin.package:
+        name: firewalld
+        state: present
+
+    - name: Add firewalld rule to allow HTTP traffic
+      ansible.builtin.firewalld:
+        service: http
+        permanent: yes
+        state: enabled
+
+    - name: Reload firewalld to apply changes
+      ansible.builtin.systemd:
+        name: firewalld
+        state: restarted
+
