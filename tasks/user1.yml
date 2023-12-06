@@ -1,7 +1,0 @@
----
-- hosts: targets                     
-  become: yes                     
-  tasks:                         
-   - name: add a new user        
-     user: name=user1            
-     

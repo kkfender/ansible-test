@@ -1,0 +1,11 @@
+---
+- name: Update Yum Packages
+  hosts: targets  # 対象となるホストやホストグループを指定
+  become: yes  # sudoで実行するために必要
+
+  tasks:
+    - name: Update Yum Packages
+      yum:
+        name: '*'
+        state: latest
+
