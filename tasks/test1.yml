@@ -1,0 +1,7 @@
+---
+- hosts: targets                      　今回inventoryのdbグループにだけ実施
+  become: yes                     　管理者権限で実行するには必要となる
+  tasks:                         
+   - name: add a new user        
+     user: name=koba             
+     
