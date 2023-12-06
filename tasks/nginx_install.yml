@@ -1,0 +1,21 @@
+---
+- name: Install Nginx on CentOS 7
+  hosts: targets
+  become: yes
+
+  tasks:
+    - name: Install EPEL repository (if not already installed)
+      ansible.builtin.yum:
+        name: epel-release
+        state: present
+
+    - name: Install Nginx
+      ansible.builtin.yum:
+        name: nginx
+        state: present
+
+    - name: Start Nginx service
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: yes
