@@ -1,0 +1,22 @@
+---
+- name: Change SELinux state to disabled
+  hosts: targets
+  become: yes
+
+  tasks:
+    - name: Set SELinux state to disabled
+      ansible.builtin.command:
+        cmd: setenforce 0
+      ignore_errors: yes
+
+    - name: Update SELinux config file
+      ansible.builtin.lineinfile:
+        path: /etc/selinux/config
+        regexp: '^SELINUX='
+        line: 'SELINUX=disabled'
+      notify: Reboot the system
+
+  handlers:
+    - name: Reboot the system
+      ansible.builtin.reboot:
+
