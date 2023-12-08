@@ -1,0 +1,72 @@
+---
+- name: Install PHP 8.2 for Laravel 10
+  hosts: targets
+  become: yes
+
+  tasks:
+    - name: Add Remi repository for PHP 8.2
+      ansible.builtin.yum_repository:
+        name: remi
+        description: Remi's RPM repository
+        baseurl: https://rpms.remirepo.net/enterprise/7/remi/x86_64/
+        gpgcheck: yes
+        gpgkey: https://rpms.remirepo.net/RPM-GPG-KEY-remi
+        enabled: yes
+        state: present
+
+    - name: Clean up existing PHP packages
+      ansible.builtin.yum:
+        name: php\*
+        state: absent
+
+    - name: Install yum-utils
+      ansible.builtin.yum:
+        name: yum-utils
+        state: present
+
+    - name: Enable remi-php82 repository
+      ansible.builtin.shell:
+        cmd: yum-config-manager --enable remi-php82
+      args:
+        executable: /bin/bash
+
+    - name: Install PHP 8.2 and required extensions
+      ansible.builtin.yum:
+        name:
+          - php82
+          - php82-php
+          - php82-php-cli
+          - php-fpm
+          - php82-php-mbstring
+          - php82-php-xml
+          - php82-php-zip
+          - php82-php-mysqlnd
+          - php82-php-bcmath
+          - php82-php-ctype
+          - php82-php-json
+          - php82-php-openssl
+          - php82-php-pdo
+          - gcc
+        enablerepo: remi
+      ignore_errors: yes
+
+    - name: Install Composer
+      ansible.builtin.shell:
+        cmd: |
+          php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+          php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+          php -r "unlink('composer-setup.php');"
+      args:
+        creates: /usr/local/bin/composer
+
+    - name: Start PHP-FPM service
+      ansible.builtin.service:
+        name: php-fpm
+        state: started
+        enabled: yes
+
+    - name: Create symbolic link /usr/bin/php
+      ansible.builtin.file:
+        src: /usr/bin/php82
+        dest: /usr/bin/php
+        state: link
